@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TalentBridge – Recruitment & HR Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a3c5e;
+    --primary-light: #2563a8;
+    --accent: #e8a020;
+    --accent-light: #fdf3e0;
+    --bg: #f7f8fc;
+    --surface: #ffffff;
+    --border: #e2e6ef;
+    --text: #1a2030;
+    --muted: #6b7280;
+    --success: #166534;
+    --success-bg: #dcfce7;
+    --danger: #991b1b;
+    --danger-bg: #fee2e2;
+    --info: #1e40af;
+    --info-bg: #dbeafe;
+    --tag-bg: #eef2ff;
+    --tag-text: #3730a3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; }
+  h1,h2,h3,h4 { font-family: 'Playfair Display', serif; }
+
+  /* NAV */
+  nav { background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.92rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: #fff; }
+  .nav-cta { background: var(--accent); color: var(--primary); padding: 8px 20px; border-radius: 6px; font-weight: 600; font-size: 0.88rem; cursor: pointer; border: none; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, var(--primary) 0%, #2557a0 60%, #1e4080 100%); color: #fff; padding: 5rem 2.5rem 4rem; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 320px; height: 320px; border-radius: 50%; background: rgba(232,160,32,0.12); }
+  .hero::after { content: ''; position: absolute; bottom: -80px; left: -40px; width: 240px; height: 240px; border-radius: 50%; background: rgba(255,255,255,0.05); }
+  .hero h1 { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.15; }
+  .hero h1 span { color: var(--accent); }
+  .hero p { font-size: 1.1rem; opacity: 0.85; max-width: 560px; margin: 0 auto 2rem; }
+  .search-bar { display: flex; gap: 0; max-width: 640px; margin: 0 auto; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.2); }
+  .search-bar input { flex: 1; padding: 14px 20px; border: none; font-size: 1rem; font-family: 'DM Sans', sans-serif; outline: none; }
+  .search-bar select { padding: 14px 16px; border: none; border-left: 1px solid var(--border); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; background: #fff; outline: none; }
+  .search-bar button { padding: 14px 28px; background: var(--accent); color: var(--primary); border: none; font-weight: 700; font-size: 0.95rem; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .hero-stats { display: flex; justify-content: center; gap: 3rem; margin-top: 3rem; }
+  .hero-stat strong { font-size: 1.8rem; font-weight: 700; color: var(--accent); display: block; }
+  .hero-stat span { font-size: 0.82rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* TABS */
+  .tabs { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; justify-content: center; gap: 0; position: sticky; top: 64px; z-index: 90; }
+  .tab { padding: 14px 28px; cursor: pointer; font-weight: 500; font-size: 0.95rem; color: var(--muted); border-bottom: 3px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'DM Sans', sans-serif; }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab:hover { color: var(--primary); }
+
+  /* SECTIONS */
+  .section { display: none; padding: 2.5rem; max-width: 1100px; margin: 0 auto; }
+  .section.visible { display: block; }
+  .section-title { font-size: 1.7rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--primary); }
+  .section-sub { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+  /* JOBS GRID */
+  .jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+  .job-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; cursor: pointer; transition: all 0.22s; position: relative; }
+  .job-card:hover { border-color: var(--primary-light); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(26,60,94,0.1); }
+  .job-card.featured { border-left: 4px solid var(--accent); }
+  .job-badge { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .badge-featured { background: var(--accent-light); color: #92400e; }
+  .badge-urgent { background: var(--danger-bg); color: var(--danger); }
+  .badge-remote { background: var(--success-bg); color: var(--success); }
+  .badge-hybrid { background: var(--info-bg); color: var(--info); }
+  .job-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+  .job-company { font-size: 0.88rem; color: var(--muted); margin-bottom: 10px; }
+  .job-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .job-tag { background: var(--tag-bg); color: var(--tag-text); font-size: 0.78rem; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .job-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--border); }
+  .job-salary { font-weight: 600; font-size: 0.9rem; color: var(--primary); }
+  .apply-btn { background: var(--primary); color: #fff; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+  .apply-btn:hover { background: var(--primary-light); }
+
+  /* JOB DETAIL MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 14px; max-width: 720px; width: 100%; margin: auto; overflow: hidden; }
+  .modal-header { background: var(--primary); color: #fff; padding: 2rem 2rem 1.5rem; position: relative; }
+  .modal-header h2 { font-size: 1.5rem; margin-bottom: 4px; }
+  .modal-header p { opacity: 0.8; font-size: 0.92rem; }
+  .modal-close { position: absolute; top: 1.2rem; right: 1.4rem; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+  .modal-body { padding: 2rem; }
+  .modal-meta { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+  .modal-meta-item { display: flex; align-items: center; gap: 6px; font-size: 0.88rem; color: var(--muted); }
+  .modal-meta-item strong { color: var(--text); }
+  .jd-section { margin-bottom: 1.5rem; }
+  .jd-section h4 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 0.6rem; border-left: 3px solid var(--accent); padding-left: 10px; }
+  .jd-section ul { list-style: disc; padding-left: 1.4rem; }
+  .jd-section li { margin-bottom: 4px; font-size: 0.92rem; color: var(--muted); }
+  .apply-form { background: var(--bg); border-radius: 10px; padding: 1.5rem; margin-top: 1.5rem; }
+  .apply-form h4 { font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 1rem; color: var(--primary); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+  .form-group input, .form-group textarea, .form-group select { padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; background: #fff; }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--primary-light); }
+  .submit-btn { background: var(--accent); color: var(--primary); padding: 12px 28px; border: none; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; font-family: 'DM Sans', sans-serif; width: 100%; margin-top: 0.5rem; transition: opacity 0.2s; }
+  .submit-btn:hover { opacity: 0.9; }
+
+  /* RECRUITMENT SECTION */
+  .policy-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; }
+  .policy-card h3 { font-size: 1.2rem; color: var(--primary); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 10px; }
+  .policy-card h3 .icon { width: 32px; height: 32px; border-radius: 8px; background: var(--info-bg); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+  .policy-card p, .policy-card li { font-size: 0.92rem; color: var(--muted); line-height: 1.7; }
+  .policy-card ul { list-style: disc; padding-left: 1.4rem; }
+  .policy-card li { margin-bottom: 5px; }
+  .process-steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; align-items: flex-start; gap: 1.2rem; padding: 1.2rem 0; border-bottom: 1px solid var(--border); }
+  .step:last-child { border-bottom: none; }
+  .step-num { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+  .step-content h5 { font-weight: 600; margin-bottom: 3px; font-family: 'DM Sans', sans-serif; }
+  .step-content p { font-size: 0.88rem; color: var(--muted); }
+  .profiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+  .profile-pill { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; }
+  .profile-pill .role { font-weight: 600; margin-bottom: 4px; }
+  .profile-pill .dept { font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; }
+  .profile-pill .criteria { font-size: 0.82rem; display: flex; flex-wrap: wrap; gap: 5px; }
+  .criteria-tag { background: var(--tag-bg); color: var(--tag-text); padding: 2px 9px; border-radius: 12px; font-size: 0.78rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th { background: var(--primary); color: #fff; padding: 10px 14px; text-align: left; font-weight: 500; font-family: 'DM Sans', sans-serif; }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: var(--bg); }
+  .comp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+  .comp-card-header { background: var(--primary); color: #fff; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+  .comp-card-header h3 { font-size: 1rem; font-family: 'DM Sans', sans-serif; font-weight: 600; }
+  .comp-card-body { padding: 1.5rem; }
+  .salary-total { font-size: 1.4rem; font-weight: 700; color: var(--primary); font-family: 'Playfair Display', serif; margin-bottom: 1rem; }
+  .salary-bar { height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; margin-bottom: 1rem; display: flex; }
+  .salary-bar-fill { height: 100%; transition: width 0.6s; }
+  .comp-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  .comp-item { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .comp-item:last-child { border-bottom: none; }
+  .comp-item .label { color: var(--muted); }
+  .comp-item .value { font-weight: 600; }
+  .level-badge { font-size: 0.72rem; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+  .level-entry { background: var(--success-bg); color: var(--success); }
+  .level-mid { background: var(--info-bg); color: var(--info); }
+  .level-senior { background: var(--accent-light); color: #92400e; }
+  .level-lead { background: var(--danger-bg); color: var(--danger); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 700px) { .two-col, .form-row, .comp-breakdown { grid-template-columns: 1fr; } .hero h1 { font-size: 2rem; } .search-bar { flex-direction: column; } }
+  .success-toast { display: none; background: var(--success-bg); color: var(--success); padding: 12px 20px; border-radius: 8px; text-align: center; margin-top: 1rem; font-weight: 600; }
+  .success-toast.show { display: block; }
+  .about-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center; }
+  .about-card h2 { color: var(--primary); margin-bottom: 1rem; }
+  .about-values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 1.5rem; }
+  .value-item { background: var(--bg); border-radius: 10px; padding: 1.2rem; text-align: center; }
+  .value-item .vi { font-size: 1.6rem; margin-bottom: 8px; }
+  .value-item h5 { font-family: 'Playfair Display', serif; margin-bottom: 4px; }
+  .value-item p { font-size: 0.82rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Talent<span>Bridge</span></div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showTab('jobs')" class="active" id="link-jobs">Find Jobs</a></li>
+    <li><a href="#" onclick="showTab('recruitment')" id="link-recruitment">Recruitment Policy</a></li>
+    <li><a href="#" onclick="showTab('compensation')" id="link-compensation">Compensation</a></li>
+    <li><a href="#" onclick="showTab('about')" id="link-about">About Us</a></li>
+  </ul>
+  <button class="nav-cta" onclick="showTab('jobs')">Post a Job</button>
+</nav>
+
+<div class="hero">
+  <h1>Find Your <span>Dream Career</span><br>or Hire Top Talent</h1>
+  <p>TalentBridge connects ambitious professionals with India's fastest-growing companies. Smart hiring, built for people.</p>
+  <div class="search-bar">
+    <input type="text" placeholder="Job title, skills, or company..." id="searchInput" oninput="filterJobs()">
+    <select id="searchDept" onchange="filterJobs()">
+      <option value="">All Departments</option>
+      <option>Technology</option>
+      <option>Marketing</option>
+      <option>Finance</option>
+      <option>Operations</option>
+      <option>Human Resources</option>
+    </select>
+    <button onclick="filterJobs()">Search Jobs</button>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>5</strong><span>Open Roles</span></div>
+    <div class="hero-stat"><strong>12+</strong><span>Partner Companies</span></div>
+    <div class="hero-stat"><strong>98%</strong><span>Placement Rate</span></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('jobs')" id="tab-jobs">Job Listings</button>
+  <button class="tab" onclick="showTab('recruitment')" id="tab-recruitment">Recruitment & Selection</button>
+  <button class="tab" onclick="showTab('compensation')" id="tab-compensation">Compensation Policy</button>
+  <button class="tab" onclick="showTab('about')" id="tab-about">About TalentBridge</button>
+</div>
+
+<!-- JOBS SECTION -->
+<div class="section visible" id="sec-jobs">
+  <h2 class="section-title">Current Openings</h2>
+  <p class="section-sub">5 positions available across multiple disciplines. Click any card to view full job description and apply.</p>
+  <div class="jobs-grid" id="jobsGrid">
+
+    <div class="job-card featured" onclick="openModal('jd1')">
+      <span class="job-badge badge-featured">Featured</span>
+      <div class="job-title">Senior Software Engineer</div>
+      <div class="job-company">TechNova Solutions Pvt. Ltd.</div>
+      <div class="job-meta">
+        <span class="job-tag">🏙️ Pune / Remote</span>
+        <span class="job-tag">⏱ Full-Time</span>
+        <span class="job-tag">Technology</span>
+      </div>
+      <div class="job-footer">
+        <span class="job-salary">₹18 – 28 LPA</span>
+        <button class="apply-btn">View & Apply</button>
+      </div>
+    </div>
+
+    <div class="job-card" onclick="openModal('jd2')">
+      <span class="job-badge badge-urgent">Urgent</span>
+      <div class="job-title">Digital Marketing Manager</div>
+      <div class="job-company">BrandCraft Agency</div>
+      <div class="job-meta">
+        <span class="job-tag">🏙️ Mumbai</span>
+        <span class="job-tag">⏱ Full-Time</span>
+        <span class="job-tag">Marketing</span>
+      </div>
+      <div class="job-footer">
+        <span class="job-salary">₹10 – 16 LPA</span>
+        <button class="apply-btn">View & Apply</button>
+      </div>
+    </div>
+
+    <div class="job-card" onclick="openModal('jd3')">
+      <span class="job-badge badge-hybrid">Hybrid</span>
+      <div class="job-title">Finance & Accounts Manager</div>
+      <div class="job-company">CapitalGrow Financial Services</div>
+      <div class="job-meta">
+        <span class="job-tag">🏙️ Bangalore</span>
+        <span class="job-tag">⏱ Full-Time</span>
+        <span class="job-tag">Finance</span>
+      </div>
+      <div class="job-footer">
+        <span class="job-salary">₹12 – 20 LPA</span>
+        <button class="apply-btn">View & Apply</button>
+      </div>
+    </div>
+
+    <div class="job-card" onclick="openModal('jd4')">
+      <span class="job-badge badge-remote">Remote</span>
+      <div class="job-title">HR Business Partner</div>
+      <div class="job-company">PeopleFirst Consulting</div>
+      <div class="job-meta">
+        <span class="job-tag">🌐 Remote</span>
+        <span class="job-tag">⏱ Full-Time</span>
+        <span class="job-tag">Human Resources</span>
+      </div>
+      <div class="job-footer">
+        <span class="job-salary">₹8 – 14 LPA</span>
+        <button class="apply-btn">View & Apply</button>
+      </div>
+    </div>
+
+    <div class="job-card featured" onclick="openModal('jd5')">
+      <span class="job-badge badge-featured">Featured</span>
+      <div class="job-title">Operations & Supply Chain Lead</div>
+      <div class="job-company">LogiCore Industries</div>
+      <div class="job-meta">
+        <span class="job-tag">🏙️ Delhi NCR</span>
+        <span class="job-tag">⏱ Full-Time</span>
+        <span class="job-tag">Operations</span>
+      </div>
+      <div class="job-footer">
+        <span class="job-salary">₹15 – 22 LPA</span>
+        <button class="apply-btn">View & Apply</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- RECRUITMENT SECTION -->
+<div class="section" id="sec-recruitment">
+  <h2 class="section-title">Recruitment & Selection Policy</h2>
+  <p class="section-sub">TalentBridge follows a structured, unbiased, and merit-based hiring framework aligned with best HR practices.</p>
+
+  <div class="policy-card">
+    <h3><span class="icon">📋</span> Policy Overview & Objectives</h3>
+    <p>TalentBridge's Recruitment & Selection Policy ensures a transparent, equitable, and efficient process for attracting and retaining top talent. Our approach is driven by the following core objectives:</p>
+    <ul style="margin-top: 0.7rem;">
+      <li>Attract qualified candidates aligned with organizational culture and values</li>
+      <li>Ensure fair, bias-free evaluation based on merit and competency</li>
+      <li>Maintain compliance with equal opportunity employment laws (EEO, PWD Act)</li>
+      <li>Optimize time-to-hire and cost-per-hire metrics</li>
+      <li>Build a diverse and inclusive workforce pipeline</li>
+      <li>Ensure a positive candidate experience throughout the hiring journey</li>
+    </ul>
+  </div>
+
+  <div class="policy-card">
+    <h3><span class="icon">🔄</span> Recruitment Process – Step by Step</h3>
+    <div class="process-steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><h5>Manpower Requisition</h5><p>Department head raises a Manpower Requisition Form (MRF), reviewed and approved by HR Head and Finance. Approval within 3 working days.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><h5>Job Analysis & JD Preparation</h5><p>HR team conducts job analysis, prepares Job Description (JD) and Job Specification (JS) in collaboration with the hiring manager. Defines KPIs and competency framework.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><h5>Sourcing & Advertising</h5><p>Positions are posted on TalentBridge Portal, LinkedIn, Naukri, and via employee referrals. Campus recruitment conducted for entry-level roles. Target: Sourcing within 5 days.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><h5>Application Screening & Shortlisting</h5><p>HR screens resumes against minimum qualifications. ATS (Applicant Tracking System) used for volume filtering. Shortlist shared with hiring manager within 7 days of posting.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><h5>Assessment & Testing</h5><p>Role-specific assessments: technical tests for engineering roles, case studies for consulting/finance, psychometric tests for leadership roles. All conducted objectively.</p></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-content"><h5>Panel Interviews</h5><p>Structured behavioural and competency-based interviews (STAR method). Minimum 2 interviewers. Scoring via standardized rubric. HR interview for culture fit. Target: 3–5 working days.</p></div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-content"><h5>Background Verification</h5><p>Employment history, educational credentials, reference checks, and where applicable, criminal record checks through third-party agencies. 5–7 working days.</p></div></div>
+      <div class="step"><div class="step-num">8</div><div class="step-content"><h5>Offer & Onboarding</h5><p>Offer letter issued with CTC breakup, joining date, and role details. Structured 30-60-90 day onboarding plan provided. HR SPOC assigned for new joiner.</p></div></div>
+    </div>
+  </div>
+
+  <div class="policy-card">
+    <h3><span class="icon">👤</span> Selection Criteria – 5 Sample Job Profiles</h3>
+    <div class="profiles-grid">
+      <div class="profile-pill">
+        <div class="role">Senior Software Engineer</div>
+        <div class="dept">Technology | 5–8 years exp.</div>
+        <div class="criteria">
+          <span class="criteria-tag">B.E./B.Tech CS/IT</span>
+          <span class="criteria-tag">Java/Python/Node</span>
+          <span class="criteria-tag">System Design</span>
+          <span class="criteria-tag">Coding Test</span>
+          <span class="criteria-tag">3 rounds</span>
+        </div>
+      </div>
+      <div class="profile-pill">
+        <div class="role">Digital Marketing Manager</div>
+        <div class="dept">Marketing | 4–7 years exp.</div>
+        <div class="criteria">
+          <span class="criteria-tag">MBA Marketing</span>
+          <span class="criteria-tag">SEO/SEM/Social</span>
+          <span class="criteria-tag">Campaign Portfolio</span>
+          <span class="criteria-tag">Case Study</span>
+          <span class="criteria-tag">2 rounds</span>
+        </div>
+      </div>
+      <div class="profile-pill">
+        <div class="role">Finance & Accounts Manager</div>
+        <div class="dept">Finance | 5–8 years exp.</div>
+        <div class="criteria">
+          <span class="criteria-tag">CA/CMA/MBA Fin.</span>
+          <span class="criteria-tag">IFRS/Ind AS</span>
+          <span class="criteria-tag">SAP/Tally</span>
+          <span class="criteria-tag">Financial Test</span>
+          <span class="criteria-tag">3 rounds</span>
+        </div>
+      </div>
+      <div class="profile-pill">
+        <div class="role">HR Business Partner</div>
+        <div class="dept">HR | 4–6 years exp.</div>
+        <div class="criteria">
+          <span class="criteria-tag">MBA HR/IR</span>
+          <span class="criteria-tag">HRBP Experience</span>
+          <span class="criteria-tag">HRIS Tools</span>
+          <span class="criteria-tag">Situational Interview</span>
+          <span class="criteria-tag">2 rounds</span>
+        </div>
+      </div>
+      <div class="profile-pill">
+        <div class="role">Operations & Supply Chain Lead</div>
+        <div class="dept">Operations | 6–10 years exp.</div>
+        <div class="criteria">
+          <span class="criteria-tag">B.E.+MBA Ops</span>
+          <span class="criteria-tag">Lean/Six Sigma</span>
+          <span class="criteria-tag">ERP/SAP</span>
+          <span class="criteria-tag">Ops Simulation</span>
+          <span class="criteria-tag">3 rounds</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="policy-card">
+    <h3><span class="icon">⚖️</span> Equal Opportunity & Compliance</h3>
+    <div class="two-col">
+      <div>
+        <p style="margin-bottom:0.6rem;"><strong>Non-Discrimination Policy:</strong> TalentBridge does not discriminate on basis of gender, religion, caste, nationality, disability, or age. All hiring decisions are purely merit-based.</p>
+        <p><strong>Diversity Targets:</strong> Minimum 33% women candidates in shortlists, active PWD inclusion, and LGBTQ+ affirming hiring practices.</p>
+      </div>
+      <div>
+        <p style="margin-bottom:0.6rem;"><strong>Compliance Framework:</strong> Aligned with Factories Act, Contract Labour Act, and Equal Remuneration Act. POSH awareness embedded in onboarding.</p>
+        <p><strong>Data Privacy:</strong> Candidate data handled under India's Digital Personal Data Protection Act (2023). Data retained for 1 year only.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPENSATION SECTION -->
+<div class="section" id="sec-compensation">
+  <h2 class="section-title">Compensation Policy & Salary Structures</h2>
+  <p class="section-sub">Market-competitive, performance-linked compensation packages with transparent breakdowns for each role.</p>
+
+  <div class="policy-card">
+    <h3><span class="icon">🎯</span> Compensation Philosophy</h3>
+    <div class="two-col">
+      <div>
+        <p style="margin-bottom:0.6rem;"><strong>Pay-for-Performance:</strong> Variable components tied to KPIs, team performance, and company profitability. Annual appraisal cycles with merit increments of 8–18%.</p>
+        <p><strong>Market Benchmarking:</strong> Compensation benchmarked against Mercer & Aon salary surveys annually. Target: P50–P75 of market median.</p>
+      </div>
+      <div>
+        <p style="margin-bottom:0.6rem;"><strong>Total Rewards:</strong> CTC includes fixed pay, variable pay, benefits, and long-term incentives (ESOPs for leadership roles).</p>
+        <p><strong>Pay Equity:</strong> Regular internal equity audits conducted. Equal pay for equal work regardless of gender or background.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.2rem; margin-bottom:1rem; color:var(--primary);">Salary Packages – 5 Profiles with CTC Breakup</h3>
+
+  <!-- Card 1 -->
+  <div class="comp-card">
+    <div class="comp-card-header">
+      <div>
+        <h3>Senior Software Engineer</h3>
+        <span style="font-size:0.8rem;opacity:0.8;">Technology | TechNova Solutions</span>
+      </div>
+      <span class="level-badge level-senior">Senior Level</span>
+    </div>
+    <div class="comp-card-body">
+      <div class="salary-total">₹23,00,000 CTC / annum <span style="font-size:0.9rem; color:var(--muted); font-family:'DM Sans';">(Mid-range)</span></div>
+      <div class="salary-bar">
+        <div class="salary-bar-fill" style="width:65%;background:#1a3c5e;"></div>
+        <div class="salary-bar-fill" style="width:20%;background:#e8a020;"></div>
+        <div class="salary-bar-fill" style="width:15%;background:#22c55e;"></div>
+      </div>
+      <div style="display:flex;gap:1.5rem;font-size:0.75rem;margin-bottom:1rem;">
+        <span>🔵 Fixed 65%</span><span>🟡 Variable 20%</span><span>🟢 Benefits 15%</span>
+      </div>
+      <div class="comp-breakdown">
+        <div class="comp-item"><span class="label">Basic Salary (40% of CTC)</span><span class="value">₹9,20,000</span></div>
+        <div class="comp-item"><span class="label">HRA (50% of Basic)</span><span class="value">₹4,60,000</span></div>
+        <div class="comp-item"><span class="label">Special Allowance</span><span class="value">₹1,38,000</span></div>
+        <div class="comp-item"><span class="label">Transport Allowance</span><span class="value">₹38,400</span></div>
+        <div class="comp-item"><span class="label">Performance Bonus (up to)</span><span class="value">₹4,60,000</span></div>
+        <div class="comp-item"><span class="label">Employer PF (12% of Basic)</span><span class="value">₹1,10,400</span></div>
+        <div class="comp-item"><span class="label">Gratuity (4.81% of Basic)</span><span class="value">₹44,252</span></div>
+        <div class="comp-item"><span class="label">Health Insurance (Family)</span><span class="value">₹72,000</span></div>
+        <div class="comp-item"><span class="label">Meal & Internet Allowance</span><span class="value">₹36,000</span></div>
+        <div class="comp-item"><span class="label">Leave Travel Allowance</span><span class="value">₹20,948</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="comp-card">
+    <div class="comp-card-header">
+      <div><h3>Digital Marketing Manager</h3><span style="font-size:0.8rem;opacity:0.8;">Marketing | BrandCraft Agency</span></div>
+      <span class="level-badge level-mid">Mid Level</span>
+    </div>
+    <div class="comp-card-body">
+      <div class="salary-total">₹13,00,000 CTC / annum <span style="font-size:0.9rem; color:var(--muted); font-family:'DM Sans';">(Mid-range)</span></div>
+      <div class="salary-bar">
+        <div class="salary-bar-fill" style="width:60%;background:#1a3c5e;"></div>
+        <div class="salary-bar-fill" style="width:25%;background:#e8a020;"></div>
+        <div class="salary-bar-fill" style="width:15%;background:#22c55e;"></div>
+      </div>
+      <div style="display:flex;gap:1.5rem;font-size:0.75rem;margin-bottom:1rem;">
+        <span>🔵 Fixed 60%</span><span>🟡 Variable 25%</span><span>🟢 Benefits 15%</span>
+      </div>
+      <div class="comp-breakdown">
+        <div class="comp-item"><span class="label">Basic Salary (40% of CTC)</span><span class="value">₹5,20,000</span></div>
+        <div class="comp-item"><span class="label">HRA (50% of Basic)</span><span class="value">₹2,60,000</span></div>
+        <div class="comp-item"><span class="label">Special Allowance</span><span class="value">₹78,000</span></div>
+        <div class="comp-item"><span class="label">Performance Bonus (up to)</span><span class="value">₹3,25,000</span></div>
+        <div class="comp-item"><span class="label">Marketing Incentive Pool</span><span class="value">₹52,000</span></div>
+        <div class="comp-item"><span class="label">Employer PF</span><span class="value">₹62,400</span></div>
+        <div class="comp-item"><span class="label">Gratuity</span><span class="value">₹25,012</span></div>
+        <div class="comp-item"><span class="label">Health Insurance</span><span class="value">₹48,000</span></div>
+        <div class="comp-item"><span class="label">Phone & Internet Reimbursement</span><span class="value">₹24,000</span></div>
+        <div class="comp-item"><span class="label">Leave Travel Allowance</span><span class="value">₹5,588</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="comp-card">
+    <div class="comp-card-header">
+      <div><h3>Finance & Accounts Manager</h3><span style="font-size:0.8rem;opacity:0.8;">Finance | CapitalGrow Financial</span></div>
+      <span class="level-badge level-senior">Senior Level</span>
+    </div>
+    <div class="comp-card-body">
+      <div class="salary-total">₹16,00,000 CTC / annum <span style="font-size:0.9rem; color:var(--muted); font-family:'DM Sans';">(Mid-range)</span></div>
+      <div class="salary-bar">
+        <div class="salary-bar-fill" style="width:70%;background:#1a3c5e;"></div>
+        <div class="salary-bar-fill" style="width:15%;background:#e8a020;"></div>
+        <div class="salary-bar-fill" style="width:15%;background:#22c55e;"></div>
+      </div>
+      <div style="display:flex;gap:1.5rem;font-size:0.75rem;margin-bottom:1rem;">
+        <span>🔵 Fixed 70%</span><span>🟡 Variable 15%</span><span>🟢 Benefits 15%</span>
+      </div>
+      <div class="comp-breakdown">
+        <div class="comp-item"><span class="label">Basic Salary (40% of CTC)</span><span class="value">₹6,40,000</span></div>
+        <div class="comp-item"><span class="label">HRA (50% of Basic)</span><span class="value">₹3,20,000</span></div>
+        <div class="comp-item"><span class="label">Special Allowance</span><span class="value">₹96,000</span></div>
+        <div class="comp-item"><span class="label">Professional Allowance</span><span class="value">₹40,000</span></div>
+        <div class="comp-item"><span class="label">Performance Bonus (up to)</span><span class="value">₹2,40,000</span></div>
+        <div class="comp-item"><span class="label">Employer PF</span><span class="value">₹76,800</span></div>
+        <div class="comp-item"><span class="label">Gratuity</span><span class="value">₹30,784</span></div>
+        <div class="comp-item"><span class="label">Health Insurance (Family)</span><span class="value">₹60,000</span></div>
+        <div class="comp-item"><span class="label">Fuel / Transport Allowance</span><span class="value">₹60,000</span></div>
+        <div class="comp-item"><span class="label">Leave Travel Allowance</span><span class="value">₹36,416</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4 -->
+  <div class="comp-card">
+    <div class="comp-card-header">
+      <div><h3>HR Business Partner</h3><span style="font-size:0.8rem;opacity:0.8;">Human Resources | PeopleFirst</span></div>
+      <span class="level-badge level-mid">Mid Level</span>
+    </div>
+    <div class="comp-card-body">
+      <div class="salary-total">₹11,00,000 CTC / annum <span style="font-size:0.9rem; color:var(--muted); font-family:'DM Sans';">(Mid-range)</span></div>
+      <div class="salary-bar">
+        <div class="salary-bar-fill" style="width:65%;background:#1a3c5e;"></div>
+        <div class="salary-bar-fill" style="width:18%;background:#e8a020;"></div>
+        <div class="salary-bar-fill" style="width:17%;background:#22c55e;"></div>
+      </div>
+      <div style="display:flex;gap:1.5rem;font-size:0.75rem;margin-bottom:1rem;">
+        <span>🔵 Fixed 65%</span><span>🟡 Variable 18%</span><span>🟢 Benefits 17%</span>
+      </div>
+      <div class="comp-breakdown">
+        <div class="comp-item"><span class="label">Basic Salary (40% of CTC)</span><span class="value">₹4,40,000</span></div>
+        <div class="comp-item"><span class="label">HRA (50% of Basic)</span><span class="value">₹2,20,000</span></div>
+        <div class="comp-item"><span class="label">Special Allowance</span><span class="value">₹55,000</span></div>
+        <div class="comp-item"><span class="label">Performance Bonus (up to)</span><span class="value">₹1,98,000</span></div>
+        <div class="comp-item"><span class="label">HR Certification Allowance</span><span class="value">₹30,000</span></div>
+        <div class="comp-item"><span class="label">Employer PF</span><span class="value">₹52,800</span></div>
+        <div class="comp-item"><span class="label">Gratuity</span><span class="value">₹21,164</span></div>
+        <div class="comp-item"><span class="label">Health Insurance</span><span class="value">₹48,000</span></div>
+        <div class="comp-item"><span class="label">Internet / WFH Allowance</span><span class="value">₹24,000</span></div>
+        <div class="comp-item"><span class="label">Leave Travel Allowance</span><span class="value">₹11,036</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 5 -->
+  <div class="comp-card">
+    <div class="comp-card-header">
+      <div><h3>Operations & Supply Chain Lead</h3><span style="font-size:0.8rem;opacity:0.8;">Operations | LogiCore Industries</span></div>
+      <span class="level-badge level-lead">Lead Level</span>
+    </div>
+    <div class="comp-card-body">
+      <div class="salary-total">₹18,50,000 CTC / annum <span style="font-size:0.9rem; color:var(--muted); font-family:'DM Sans';">(Mid-range)</span></div>
+      <div class="salary-bar">
+        <div class="salary-bar-fill" style="width:62%;background:#1a3c5e;"></div>
+        <div class="salary-bar-fill" style="width:22%;background:#e8a020;"></div>
+        <div class="salary-bar-fill" style="width:16%;background:#22c55e;"></div>
+      </div>
+      <div style="display:flex;gap:1.5rem;font-size:0.75rem;margin-bottom:1rem;">
+        <span>🔵 Fixed 62%</span><span>🟡 Variable 22%</span><span>🟢 Benefits 16%</span>
+      </div>
+      <div class="comp-breakdown">
+        <div class="comp-item"><span class="label">Basic Salary (40% of CTC)</span><span class="value">₹7,40,000</span></div>
+        <div class="comp-item"><span class="label">HRA (50% of Basic)</span><span class="value">₹3,70,000</span></div>
+        <div class="comp-item"><span class="label">Special Allowance</span><span class="value">₹1,00,000</span></div>
+        <div class="comp-item"><span class="label">Performance Bonus (up to)</span><span class="value">₹4,07,000</span></div>
+        <div class="comp-item"><span class="label">Shift / Site Allowance</span><span class="value">₹60,000</span></div>
+        <div class="comp-item"><span class="label">Employer PF</span><span class="value">₹88,800</span></div>
+        <div class="comp-item"><span class="label">Gratuity</span><span class="value">₹35,594</span></div>
+        <div class="comp-item"><span class="label">Health Insurance (Family)</span><span class="value">₹72,000</span></div>
+        <div class="comp-item"><span class="label">Company Car / Fuel</span><span class="value">₹60,000</span></div>
+        <div class="comp-item"><span class="label">Leave Travel Allowance</span><span class="value">₹16,606</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="policy-card" style="margin-top:1.5rem;">
+    <h3><span class="icon">📊</span> Benefits & Perquisites – All Employees</h3>
+    <div class="two-col">
+      <div>
+        <ul>
+          <li>Statutory benefits: PF, Gratuity, ESI (where applicable), Bonus</li>
+          <li>Mediclaim: ₹3–10 lakh family floater based on grade</li>
+          <li>Term life insurance: 3x annual CTC</li>
+          <li>Personal accidental insurance: ₹25 lakh</li>
+          <li>Leave encashment: Up to 30 earned leaves per year</li>
+        </ul>
+      </div>
+      <div>
+        <ul>
+          <li>Flexible working hours & hybrid / remote options</li>
+          <li>Annual learning & development budget: ₹15,000–₹50,000</li>
+          <li>ESOPs for Band 5 and above (3-year vesting)</li>
+          <li>Maternity (26 weeks) / Paternity (15 days) paid leave</li>
+          <li>Employee Assistance Program (EAP) – free counselling</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT SECTION -->
+<div class="section" id="sec-about">
+  <div class="about-card">
+    <h2 style="font-size:2rem; margin-bottom:0.5rem;">About TalentBridge</h2>
+    <p style="color:var(--muted); max-width:600px; margin:0 auto 1.5rem; line-height:1.8;">TalentBridge is a next-generation digital recruitment firm dedicated to bridging the gap between exceptional talent and forward-thinking organizations. Founded with the vision of making hiring human again, we combine technology with empathy to deliver outstanding hiring outcomes.</p>
+    <div style="display:flex; justify-content:center; gap:3rem; flex-wrap:wrap; padding:1.5rem 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-bottom:1.5rem;">
+      <div style="text-align:center;"><strong style="font-size:1.8rem;color:var(--primary);font-family:'Playfair Display',serif;">2019</strong><div style="font-size:0.8rem;color:var(--muted);">Founded</div></div>
+      <div style="text-align:center;"><strong style="font-size:1.8rem;color:var(--primary);font-family:'Playfair Display',serif;">1,200+</strong><div style="font-size:0.8rem;color:var(--muted);">Placements</div></div>
+      <div style="text-align:center;"><strong style="font-size:1.8rem;color:var(--primary);font-family:'Playfair Display',serif;">85+</strong><div style="font-size:0.8rem;color:var(--muted);">Partner Companies</div></div>
+      <div style="text-align:center;"><strong style="font-size:1.8rem;color:var(--primary);font-family:'Playfair Display',serif;">6</strong><div style="font-size:0.8rem;color:var(--muted);">Cities</div></div>
+    </div>
+    <div class="about-values">
+      <div class="value-item"><div class="vi">🎯</div><h5>Precision Matching</h5><p>We use AI + human intuition to match candidates to roles where they'll genuinely thrive.</p></div>
+      <div class="value-item"><div class="vi">🤝</div><h5>Integrity First</h5><p>Transparent processes, honest feedback, and ethical hiring are non-negotiables for us.</p></div>
+      <div class="value-item"><div class="vi">🌱</div><h5>Inclusive Growth</h5><p>We champion diversity and actively work to remove systemic barriers in hiring.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- JOB DETAIL MODALS -->
+<div class="modal-overlay" id="modal-jd1" onclick="closeModal(event,'jd1')">
+<div class="modal">
+  <div class="modal-header">
+    <button class="modal-close" onclick="closeModalDirect('jd1')">✕</button>
+    <h2>Senior Software Engineer</h2>
+    <p>TechNova Solutions Pvt. Ltd. · Pune / Remote · Full-Time</p>
+  </div>
+  <div class="modal-body">
+    <div class="modal-meta">
+      <div class="modal-meta-item">💰 <strong>₹18 – 28 LPA</strong></div>
+      <div class="modal-meta-item">🎓 <strong>B.E./B.Tech in CS/IT</strong></div>
+      <div class="modal-meta-item">⏳ <strong>5–8 Years Experience</strong></div>
+      <div class="modal-meta-item">🏢 <strong>Hybrid / Remote</strong></div>
+    </div>
+    <div class="jd-section"><h4>Role Summary</h4><p>Design, develop, and maintain scalable software systems for TechNova's flagship SaaS products. Lead technical architecture discussions and mentor junior developers.</p></div>
+    <div class="jd-section"><h4>Key Responsibilities</h4><ul>
+      <li>Design and implement high-performance microservices and APIs</li>
+      <li>Conduct code reviews and enforce engineering best practices</li>
+      <li>Collaborate with product managers to translate business needs into technical solutions</li>
+      <li>Lead technical design reviews and architecture decisions</li>
+      <li>Optimize application performance, scalability, and reliability</li>
+      <li>Mentor 2–3 junior developers in agile team setup</li>
+    </ul></div>
+    <div class="jd-section"><h4>Required Skills & Qualifications</h4><ul>
+      <li>B.E./B.Tech in Computer Science, IT, or related field (mandatory)</li>
+      <li>5–8 years of software engineering experience; 2+ years in senior/lead roles</li>
+      <li>Proficiency in Java, Python, or Node.js; REST API design</li>
+      <li>Experience with cloud platforms (AWS/Azure/GCP) and Docker/Kubernetes</li>
+      <li>Strong understanding of data structures, algorithms, and system design</li>
+      <li>Familiarity with CI/CD pipelines and DevOps practices</li>
+    </ul></div>
+    <div class="jd-section"><h4>Preferred / Nice-to-Have</h4><ul>
+      <li>Open-source contributions or portfolio projects</li>
+      <li>Experience with AI/ML integrations</li>
+      <li>Agile/Scrum certification</li>
+    </ul></div>
+    <div class="jd-section"><h4>Selection Process</h4><p>Round 1: Online Coding Test (90 min) → Round 2: Technical Interview (System Design) → Round 3: Hiring Manager + HR Interview</p></div>
+    <div class="apply-form">
+      <h4>Apply for this Position</h4>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" placeholder="Your full name"></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" placeholder="your@email.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Current CTC (LPA)</label><input type="text" placeholder="e.g. 15"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:1rem;"><label>LinkedIn / Portfolio URL</label><input type="url" placeholder="https://linkedin.com/in/yourname"></div>
+      <div class="form-group" style="margin-bottom:1rem;"><label>Brief Cover Note</label><textarea rows="3" placeholder="Why are you a great fit for this role?"></textarea></div>
+      <button class="submit-btn" onclick="submitApp('jd1')">Submit Application →</button>
+      <div class="success-toast" id="toast-jd1">✅ Application submitted! We'll be in touch within 5 business days.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-jd2" onclick="closeModal(event,'jd2')">
+<div class="modal">
+  <div class="modal-header">
+    <button class="modal-close" onclick="closeModalDirect('jd2')">✕</button>
+    <h2>Digital Marketing Manager</h2>
+    <p>BrandCraft Agency · Mumbai · Full-Time</p>
+  </div>
+  <div class="modal-body">
+    <div class="modal-meta">
+      <div class="modal-meta-item">💰 <strong>₹10 – 16 LPA</strong></div>
+      <div class="modal-meta-item">🎓 <strong>MBA / PGDM Marketing</strong></div>
+      <div class="modal-meta-item">⏳ <strong>4–7 Years Experience</strong></div>
+      <div class="modal-meta-item">🏢 <strong>On-site, Mumbai</strong></div>
+    </div>
+    <div class="jd-section"><h4>Role Summary</h4><p>Own and execute BrandCraft's digital marketing strategy across SEO, SEM, social media, and content marketing. Drive measurable growth in brand visibility and lead generation for B2B and D2C clients.</p></div>
+    <div class="jd-section"><h4>Key Responsibilities</h4><ul>
+      <li>Plan and execute integrated digital marketing campaigns (paid + organic)</li>
+      <li>Manage monthly budgets of ₹20–50 lakh across platforms</li>
+      <li>Lead a team of 4 digital marketing specialists</li>
+      <li>Track performance using Google Analytics, Meta Ads Manager, and HubSpot</li>
+      <li>Develop SEO strategy and content calendar in collaboration with content team</li>
+      <li>Report ROI metrics monthly to CXO leadership</li>
+    </ul></div>
+    <div class="jd-section"><h4>Required Skills & Qualifications</h4><ul>
+      <li>MBA/PGDM in Marketing from a reputed institute (mandatory)</li>
+      <li>4–7 years in digital marketing; minimum 2 years in a managerial role</li>
+      <li>Certified in Google Ads, Meta Blueprint, or HubSpot (at least one)</li>
+      <li>Hands-on experience with SEO tools: SEMrush, Ahrefs, Screaming Frog</li>
+      <li>Proficiency in CRM platforms and marketing automation tools</li>
+    </ul></div>
+    <div class="jd-section"><h4>Selection Process</h4><p>Round 1: Portfolio / Work Sample Review → Round 2: Digital Marketing Case Study (take-home) → Round 3: VP Marketing Interview</p></div>
+    <div class="apply-form">
+      <h4>Apply for this Position</h4>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" placeholder="Your full name"></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" placeholder="your@email.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Current CTC (LPA)</label><input type="text" placeholder="e.g. 10"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:1rem;"><label>Portfolio / Campaign Examples URL</label><input type="url" placeholder="https://your-portfolio.com"></div>
+      <div class="form-group" style="margin-bottom:1rem;"><label>Brief Cover Note</label><textarea rows="3" placeholder="Describe your most successful campaign..."></textarea></div>
+      <button class="submit-btn" onclick="submitApp('jd2')">Submit Application →</button>
+      <div class="success-toast" id="toast-jd2">✅ Application submitted! We'll be in touch within 5 business days.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-jd3" onclick="closeModal(event,'jd3')">
+<div class="modal">
+  <div class="modal-header">
+    <button class="modal-close" onclick="closeModalDirect('jd3')">✕</button>
+    <h2>Finance & Accounts Manager</h2>
+    <p>CapitalGrow Financial Services · Bangalore · Hybrid</p>
+  </div>
+  <div class="modal-body">
+    <div class="modal-meta">
+      <div class="modal-meta-item">💰 <strong>₹12 – 20 LPA</strong></div>
+      <div class="modal-meta-item">🎓 <strong>CA / CMA / MBA Finance</strong></div>
+      <div class="modal-meta-item">⏳ <strong>5–8 Years Experience</strong></div>
+      <div class="modal-meta-item">🏢 <strong>Hybrid, Bangalore</strong></div>
+    </div>
+    <div class="jd-section"><h4>Role Summary</h4><p>Oversee the financial health of CapitalGrow's operations including reporting, compliance, taxation, and treasury management. Partner with the CFO to deliver strategic financial insights.</p></div>
+    <div class="jd-section"><h4>Key Responsibilities</h4><ul>
+      <li>Prepare and review monthly, quarterly, and annual financial statements (Ind AS / IFRS)</li>
+      <li>Manage direct and indirect tax compliance (GST, TDS, Income Tax)</li>
+      <li>Lead month-end close process and coordinate with auditors</li>
+      <li>Treasury management: liquidity planning and cash flow forecasting</li>
+      <li>Financial modelling for business proposals and investment decisions</li>
+      <li>Manage a team of 3–5 accounts executives</li>
+    </ul></div>
+    <div class="jd-section"><h4>Required Skills & Qualifications</h4><ul>
+      <li>Qualified CA / CMA or MBA Finance from premier institute (mandatory)</li>
+      <li>5–8 years in finance/accounts; minimum 2 years in managerial capacity</li>
+      <li>Strong command of Ind AS / IFRS accounting standards</li>
+      <li>Proficiency in SAP S/4HANA or Tally ERP</li>
+      <li>Experience with Big 4 audits preferred</li>
+    </ul></div>
+    <div class="jd-section"><h4>Selection Process</h4><p>Round 1: Technical Finance Test → Round 2: Case Study – Financial Analysis → Round 3: CFO + HR Interview</p></div>
+    <div class="apply-form">
+      <h4>Apply for this Position</h4>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" placeholder="Your full name"></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" placeholder="your@email.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Qualification</label><select><option>CA</option><option>CMA</option><option>MBA Finance</option><option>Other</option></select></div>
+      </div>
+      <div class="form-group" style="margin-bottom:1rem;"><label>Brief Cover Note</label><textarea rows="3" placeholder="Describe your finance expertise..."></textarea></div>
+      <button class="submit-btn" onclick="submitApp('jd3')">Submit Application →</button>
+      <div class="success-toast" id="toast-jd3">✅ Application submitted! We'll be in touch within 5 business days.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-jd4" onclick="closeModal(event,'jd4')">
+<div class="modal">
+  <div class="modal-header">
+    <button class="modal-close" onclick="closeModalDirect('jd4')">✕</button>
+    <h2>HR Business Partner</h2>
+    <p>PeopleFirst Consulting · Remote · Full-Time</p>
+  </div>
+  <div class="modal-body">
+    <div class="modal-meta">
+      <div class="modal-meta-item">💰 <strong>₹8 – 14 LPA</strong></div>
+      <div class="modal-meta-item">🎓 <strong>MBA HR / MSW / MHRM</strong></div>
+      <div class="modal-meta-item">⏳ <strong>4–6 Years Experience</strong></div>
+      <div class="modal-meta-item">🌐 <strong>Fully Remote</strong></div>
+    </div>
+    <div class="jd-section"><h4>Role Summary</h4><p>Act as a strategic HR partner for 2–3 business verticals. Support leadership in talent management, employee engagement, performance management, and HR policy implementation.</p></div>
+    <div class="jd-section"><h4>Key Responsibilities</h4><ul>
+      <li>Partner with business leaders on workforce planning and talent strategy</li>
+      <li>Drive annual performance management cycle (goal-setting, appraisal, calibration)</li>
+      <li>Manage employee relations, grievances, and disciplinary processes</li>
+      <li>Implement engagement initiatives: pulse surveys, skip-levels, town halls</li>
+      <li>Support recruitment for mid-senior roles in assigned business units</li>
+      <li>Drive HR analytics – attrition, productivity, and engagement dashboards</li>
+    </ul></div>
+    <div class="jd-section"><h4>Required Skills & Qualifications</h4><ul>
+      <li>MBA in HR / MHRM / MSW (Labour Welfare) from reputed institute</li>
+      <li>4–6 years of HRBP experience in mid-to-large size organizations</li>
+      <li>Working knowledge of HRIS platforms: Darwinbox, SAP SuccessFactors, or Workday</li>
+      <li>Strong stakeholder management and influencing skills</li>
+      <li>Knowledge of Indian labour laws (ID Act, Shops & Establishments, POSH)</li>
+    </ul></div>
+    <div class="jd-section"><h4>Selection Process</h4><p>Round 1: HR Situational Judgment Test → Round 2: Competency-based Interview with CHRO → Round 3: Business Leader Discussion</p></div>
+    <div class="apply-form">
+      <h4>Apply for this Position</h4>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" placeholder="Your full name"></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" placeholder="your@email.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Current CTC (LPA)</label><input type="text" placeholder="e.g. 9"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:1rem;"><label>Brief Cover Note</label><textarea rows="3" placeholder="What makes you an effective HR Business Partner?"></textarea></div>
+      <button class="submit-btn" onclick="submitApp('jd4')">Submit Application →</button>
+      <div class="success-toast" id="toast-jd4">✅ Application submitted! We'll be in touch within 5 business days.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-jd5" onclick="closeModal(event,'jd5')">
+<div class="modal">
+  <div class="modal-header">
+    <button class="modal-close" onclick="closeModalDirect('jd5')">✕</button>
+    <h2>Operations & Supply Chain Lead</h2>
+    <p>LogiCore Industries · Delhi NCR · Full-Time</p>
+  </div>
+  <div class="modal-body">
+    <div class="modal-meta">
+      <div class="modal-meta-item">💰 <strong>₹15 – 22 LPA</strong></div>
+      <div class="modal-meta-item">🎓 <strong>B.E. + MBA Operations</strong></div>
+      <div class="modal-meta-item">⏳ <strong>6–10 Years Experience</strong></div>
+      <div class="modal-meta-item">🏢 <strong>On-site, Delhi NCR</strong></div>
+    </div>
+    <div class="jd-section"><h4>Role Summary</h4><p>Lead end-to-end supply chain operations for LogiCore's manufacturing and distribution network. Drive efficiency improvements through lean methodologies and digital transformation of supply chain systems.</p></div>
+    <div class="jd-section"><h4>Key Responsibilities</h4><ul>
+      <li>Manage procurement, inventory, warehousing, and last-mile logistics</li>
+      <li>Develop and monitor KPIs: OTIF, inventory turns, fill rate, and cost-per-unit</li>
+      <li>Lead lean/Six Sigma improvement projects to reduce waste and cycle times</li>
+      <li>Vendor development: onboarding, performance management, and negotiations</li>
+      <li>Implement and optimize ERP/WMS systems (SAP, Oracle, or equivalent)</li>
+      <li>Lead a cross-functional team of 15–20 operations professionals</li>
+    </ul></div>
+    <div class="jd-section"><h4>Required Skills & Qualifications</h4><ul>
+      <li>B.E. (Mechanical/Industrial/Production) + MBA Operations (mandatory)</li>
+      <li>6–10 years in supply chain / operations; 3+ years in a leadership role</li>
+      <li>Green Belt or Black Belt in Lean / Six Sigma (mandatory)</li>
+      <li>Hands-on with ERP systems: SAP MM/WM/PP modules preferred</li>
+      <li>Excellent analytical skills; proficiency in Excel and Power BI</li>
+    </ul></div>
+    <div class="jd-section"><h4>Selection Process</h4><p>Round 1: Operations Simulation Test → Round 2: Case Study (Supply Chain Optimization) → Round 3: COO + HR Interview Panel</p></div>
+    <div class="apply-form">
+      <h4>Apply for this Position</h4>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" placeholder="Your full name"></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" placeholder="your@email.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="form-group"><label>Six Sigma Belt Level</label><select><option>Green Belt</option><option>Black Belt</option><option>Master Black Belt</option><option>Not certified</option></select></div>
+      </div>
+      <div class="form-group" style="margin-bottom:1rem;"><label>Brief Cover Note</label><textarea rows="3" placeholder="Describe your biggest supply chain achievement..."></textarea></div>
+      <button class="submit-btn" onclick="submitApp('jd5')">Submit Application →</button>
+      <div class="success-toast" id="toast-jd5">✅ Application submitted! We'll be in touch within 5 business days.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function showTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('sec-' + tab).classList.add('visible');
+  document.getElementById('tab-' + tab).classList.add('active');
+  const link = document.getElementById('link-' + tab);
+  if (link) link.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  return false;
+}
+
+function openModal(id) {
+  document.getElementById('modal-' + id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModalDirect(id) {
+  document.getElementById('modal-' + id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModal(e, id) {
+  if (e.target === document.getElementById('modal-' + id)) {
+    closeModalDirect(id);
+  }
+}
+
+function submitApp(id) {
+  const toast = document.getElementById('toast-' + id);
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 5000);
+}
+
+function filterJobs() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const dept = document.getElementById('searchDept').value.toLowerCase();
+  document.querySelectorAll('.job-card').forEach(card => {
+    const text = card.innerText.toLowerCase();
+    const match = (!q || text.includes(q)) && (!dept || text.includes(dept));
+    card.style.display = match ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
